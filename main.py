@@ -1,19 +1,20 @@
-from fastapi import FastAPI, Request
-from fastapi.exceptions import RequestValidationError
-from starlette.responses import JSONResponse
-from starlette import status
-from fastapi.encoders import jsonable_encoder
-import asyncio
-import os 
-import uvicorn
-from fastapi.middleware.cors import CORSMiddleware
-from tortoise import Tortoise
-from contextlib import asynccontextmanager
-from dotenv import load_dotenv
-
 from app.schemas.api_response import ApiResponse
 from app.api import router
 from db_config import TORTOISE_ORM
+
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.encoders import jsonable_encoder
+import asyncio
+import uvicorn
+from fastapi.middleware.cors import CORSMiddleware
+from tortoise import Tortoise
+from dotenv import load_dotenv
+
+from starlette.responses import JSONResponse
+from starlette import status
+from contextlib import asynccontextmanager
+import os
 
 
 load_dotenv()
@@ -29,10 +30,7 @@ async def lifespan(app: FastAPI):
     await Tortoise.close_connections()
 
 
-app = FastAPI(
-    debug=os.getenv("DEBUG"),
-    lifespan=lifespan,
-)
+app = FastAPI(debug=os.getenv("DEBUG"), lifespan=lifespan)
 
 
 @app.exception_handler(RequestValidationError)
@@ -54,11 +52,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.get("/", include_in_schema=False)
-async def root():
-    return f"APP IS RUNNING !"
 
 
 app.include_router(router)
